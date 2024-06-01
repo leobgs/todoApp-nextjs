@@ -16,7 +16,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-modal": "^3.16.1",
-    "react-toastify": "^10.0.5"
+    "react-toastify": "^10.0.5",
+    "vercel": "^34.2.4"
   },
   "devDependencies": {
     "eslint": "^8",

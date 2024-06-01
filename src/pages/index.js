@@ -14,18 +14,14 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchTodos() {
-      try {
-        const response = await axios.get("/api/todos");
-        const todosWithFormattedDueDate = response.data.map((todo) => ({
-          ...todo,
-          dueDate: todo.dueDate
-            ? new Date(todo.dueDate).toISOString().substr(0, 10)
-            : "",
-        }));
-        setTodos(todosWithFormattedDueDate);
-      } catch (error) {
-        toast.error("Failed to fetch todos");
-      }
+      const response = await axios.get("/api/todos");
+      const todosWithFormattedDueDate = response.data.map((todo) => ({
+        ...todo,
+        dueDate: todo.dueDate
+          ? new Date(todo.dueDate).toISOString().substr(0, 10)
+          : "",
+      }));
+      setTodos(todosWithFormattedDueDate);
     }
     fetchTodos();
   }, []);
@@ -34,7 +30,7 @@ export default function Home() {
     return date ? new Date(date).toLocaleDateString() : "";
   };
 
-  const handleAddTodo = async () => {
+  const addTodo = async () => {
     if (newTodo.trim() === "") {
       toast.error("Title is required");
       return;
@@ -46,8 +42,8 @@ export default function Home() {
       });
       const { _id, title, completed, dueDate: newDueDate } = response.data;
       const formattedDueDate = formatDate(newDueDate);
-      setTodos((prevTodos) => [
-        ...prevTodos,
+      setTodos([
+        ...todos,
         { _id, title, completed, dueDate: formattedDueDate },
       ]);
       setNewTodo("");
@@ -58,11 +54,16 @@ export default function Home() {
     }
   };
 
-  const handleUpdateTodo = async (id, title) => {
+  const updateTodo = async (id, updates) => {
     try {
-      await axios.put(`/api/todos/${id}`, { title });
-      setTodos((prevTodos) =>
-        prevTodos.map((todo) => (todo._id === id ? { ...todo, title } : todo))
+      const response = await axios.put(`/api/todos/${id}`, updates);
+      const formattedDueDate = formatDate(response.data.dueDate);
+      setTodos(
+        todos.map((todo) =>
+          todo._id === id
+            ? { ...response.data, dueDate: formattedDueDate }
+            : todo
+        )
       );
       toast.success("To-Do updated successfully");
     } catch (error) {
@@ -70,22 +71,26 @@ export default function Home() {
     }
   };
 
-  const handleDeleteTodo = async (id) => {
+  const deleteTodo = async (id) => {
     try {
       await axios.delete(`/api/todos/${id}`);
-      setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
+      setTodos(todos.filter((todo) => todo._id !== id));
       toast.success("To-Do deleted successfully");
     } catch (error) {
       toast.error("Failed to delete To-Do");
     }
   };
 
-  const handleOpenEditModal = (todo) => {
+  const handleTitleChange = (id, title) => {
+    updateTodo(id, { title });
+  };
+
+  const openEditModal = (todo) => {
     setSelectedTodo(todo);
     setEditModalOpen(true);
   };
 
-  const handleCloseEditModal = () => {
+  const closeEditModal = () => {
     setSelectedTodo(null);
     setEditModalOpen(false);
   };
@@ -110,7 +115,7 @@ export default function Home() {
           onChange={(e) => setDueDate(e.target.value)}
           placeholder="Add a new to-do"
         />
-        <button className={styles.button} onClick={handleAddTodo}>
+        <button className={styles.button} onClick={addTodo}>
           Add
         </button>
       </div>
@@ -141,7 +146,7 @@ export default function Home() {
                     className={styles.checkbox}
                     checked={todo.completed}
                     onChange={() =>
-                      handleUpdateTodo(todo._id, {
+                      updateTodo(todo._id, {
                         completed: !todo.completed,
                         dueDate: todo.dueDate,
                       })
@@ -160,7 +165,7 @@ export default function Home() {
                     className={styles.input}
                     value={todo.dueDate || ""}
                     onChange={(e) =>
-                      handleUpdateTodo(todo._id, {
+                      updateTodo(todo._id, {
                         completed: todo.completed,
                         dueDate: e.target.value,
                       })
@@ -168,13 +173,13 @@ export default function Home() {
                   />
                   <button
                     className={styles.deleteButton}
-                    onClick={() => handleDeleteTodo(todo._id)}
+                    onClick={() => deleteTodo(todo._id)}
                   >
                     Delete
                   </button>
                   <button
                     className={styles.editButton}
-                    onClick={() => handleOpenEditModal(todo)}
+                    onClick={() => openEditModal(todo)}
                   >
                     Edit
                   </button>
@@ -186,9 +191,9 @@ export default function Home() {
       )}
       <EditModal
         isOpen={editModalOpen}
-        onRequestClose={handleCloseEditModal}
+        onRequestClose={closeEditModal}
         todo={selectedTodo}
-        onUpdate={handleUpdateTodo}
+        onUpdate={(id, title) => handleTitleChange(id, title)}
       />
     </div>
   );
