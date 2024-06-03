@@ -100,6 +100,7 @@ export default function Home() {
       <ToastContainer />
       <h1>To-Do List</h1>
       <div className={styles.inputContainer}>
+        <label htmlFor="inputATodo">Input a Todo: </label>
         <input
           type="text"
           className={styles.input}
@@ -107,7 +108,7 @@ export default function Home() {
           onChange={(e) => setNewTodo(e.target.value)}
           placeholder="Add a new to-do"
         />
-        <label htmlFor="dueDateInput">Due Date:</label>
+        <label htmlFor="dueDateInput">Input Due Date: </label>
         <input
           type="date"
           className={styles.input}
