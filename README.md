@@ -7,7 +7,7 @@ First, clone this repository:
 ```bash
 git clone https://github.com/leobgs/todoApp-nextjs.git
 ```
-or you can download as ZIP
+or you can download as ZIP.
 
 Second, install and run in local server:
 
@@ -28,6 +28,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 To see a deployment web in server please visit:
 
-- [Todo-App](https://todo-app-nextjs-dusky.vercel.app/).
+- [Todo-App](https://todo-app-nextjs-leobgs-projects.vercel.app/).
 
 
